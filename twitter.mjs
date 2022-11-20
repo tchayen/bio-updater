@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import fetch from "node-fetch";
 import OAuth from "oauth-1.0a";
+import chalk from "chalk";
 import { commandLineInput, paramsToObject } from "./utils.mjs";
 
 if (!process.env.TWITTER_CONSUMER_KEY) {
@@ -73,17 +74,19 @@ async function authenticate() {
     "oauth_token",
     oAuthRequestToken.oauth_token
   );
-  console.log("Please go here and authorize:", authorizeURL.href);
-  const pin = await commandLineInput("Paste the PIN here: ");
+  console.log(
+    `${chalk.italic("Please go here and authorize:")} ${chalk.bold(
+      authorizeURL.href
+    )}`
+  );
+  const pin = await commandLineInput(`${chalk.italic("Paste the PIN here:")} `);
   const oAuthAccessToken = await getAccessToken(oAuthRequestToken, pin.trim());
   return oAuthAccessToken;
 }
 
 export async function twitter(bio) {
-  const endpointURL = `https://api.twitter.com/1.1/account/update_profile.json?${new URLSearchParams(
-    {
-      description: bio,
-    }
+  const endpointURL = `https://api.twitter.com/1.1/account/update_profile.json?description=${encodeURIComponent(
+    bio
   ).toString()}`;
 
   const { oauth_token, oauth_token_secret } = await authenticate();
@@ -109,11 +112,13 @@ export async function twitter(bio) {
       Authorization: authHeader["Authorization"],
       "Content-Type": "application/json",
     },
-    // body: JSON.stringify({
-    //   description: bio,
-    // }),
   });
 
   const response = await request.json();
-  console.log("Twitter:", response);
+
+  if (response.description === bio) {
+    console.log("Twitter: ✅");
+  } else {
+    console.log("Twitter: ❌");
+  }
 }

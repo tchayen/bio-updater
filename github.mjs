@@ -17,5 +17,9 @@ export async function gitHub(bio) {
   });
 
   const response = await request.json();
-  console.log("GitHub:", response);
+  if (response.bio === bio) {
+    console.log("GitHub: ✅");
+  } else {
+    console.log("GitHub: ❌");
+  }
 }
