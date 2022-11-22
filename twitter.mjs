@@ -1,16 +1,10 @@
+import * as dotenv from "dotenv";
+dotenv.config();
 import crypto from "crypto";
 import fetch from "node-fetch";
 import OAuth from "oauth-1.0a";
 import chalk from "chalk";
 import { commandLineInput, paramsToObject } from "./utils.mjs";
-
-if (!process.env.TWITTER_CONSUMER_KEY) {
-  throw new Error('Missing "TWITTER_CONSUMER_KEY" environment variable.');
-}
-
-if (!process.env.TWITTER_CONSUMER_SECRET) {
-  throw new Error('Missing "TWITTER_CONSUMER_SECRET" environment variable.');
-}
 
 const requestTokenURL =
   "https://api.twitter.com/oauth/request_token?oauth_callback=oob";
@@ -42,8 +36,11 @@ async function getRequestToken() {
     },
   });
 
-  const response = new URLSearchParams(await request.text());
-  return paramsToObject(response.entries());
+  const response = await request.text();
+  if (response.startsWith('{"errors"')) {
+    throw new Error("Error.");
+  }
+  return paramsToObject(new URLSearchParams(response).entries());
 }
 
 async function getAccessToken({ oauth_token, oauth_token_secret }, verifier) {
@@ -63,8 +60,11 @@ async function getAccessToken({ oauth_token, oauth_token_secret }, verifier) {
     },
   });
 
-  const response = new URLSearchParams(await request.text());
-  return paramsToObject(response.entries());
+  const response = await request.text();
+  if (response.startsWith('{"errors"')) {
+    throw new Error("Error.");
+  }
+  return paramsToObject(new URLSearchParams(response).entries());
 }
 
 async function authenticate() {
@@ -85,6 +85,14 @@ async function authenticate() {
 }
 
 export async function twitter(bio) {
+  if (!process.env.TWITTER_CONSUMER_KEY) {
+    throw new Error('Missing "TWITTER_CONSUMER_KEY" environment variable.');
+  }
+
+  if (!process.env.TWITTER_CONSUMER_SECRET) {
+    throw new Error('Missing "TWITTER_CONSUMER_SECRET" environment variable.');
+  }
+
   const endpointURL = `https://api.twitter.com/1.1/account/update_profile.json?description=${encodeURIComponent(
     bio
   ).toString()}`;
@@ -119,6 +127,7 @@ export async function twitter(bio) {
   if (response.description === bio) {
     console.log("Twitter: ✅");
   } else {
+    console.log(response);
     console.log("Twitter: ❌");
   }
 }

@@ -1,10 +1,12 @@
+import * as dotenv from "dotenv";
+dotenv.config();
 import fetch from "node-fetch";
 
-if (!process.env.GITHUB_BEARER_TOKEN) {
-  throw new Error('Missing "GITHUB_BEARER_TOKEN" environment variable.');
-}
-
 export async function gitHub(bio) {
+  if (!process.env.GITHUB_BEARER_TOKEN) {
+    throw new Error('Missing "GITHUB_BEARER_TOKEN" environment variable.');
+  }
+
   const request = await fetch("https://api.github.com/user", {
     method: "PATCH",
     headers: {
@@ -20,6 +22,7 @@ export async function gitHub(bio) {
   if (response.bio === bio) {
     console.log("GitHub: ✅");
   } else {
+    console.log(response);
     console.log("GitHub: ❌");
   }
 }
