@@ -4,7 +4,10 @@ import fetch from "node-fetch";
 
 export async function mastodon(bio) {
   if (!process.env.MASTODON_BEARER_TOKEN) {
-    throw new Error('Missing "MASTODON_BEARER_TOKEN" environment variable.');
+    console.log(
+      'Missing "MASTODON_BEARER_TOKEN" environment variable. Skipping.'
+    );
+    return;
   }
 
   const request = await fetch(

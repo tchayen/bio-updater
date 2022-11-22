@@ -86,11 +86,17 @@ async function authenticate() {
 
 export async function twitter(bio) {
   if (!process.env.TWITTER_CONSUMER_KEY) {
-    throw new Error('Missing "TWITTER_CONSUMER_KEY" environment variable.');
+    console.log(
+      'Missing "TWITTER_CONSUMER_KEY" environment variable. Skipping.'
+    );
+    return;
   }
 
   if (!process.env.TWITTER_CONSUMER_SECRET) {
-    throw new Error('Missing "TWITTER_CONSUMER_SECRET" environment variable.');
+    console.log(
+      'Missing "TWITTER_CONSUMER_SECRET" environment variable. Skipping.'
+    );
+    return;
   }
 
   const endpointURL = `https://api.twitter.com/1.1/account/update_profile.json?description=${encodeURIComponent(
