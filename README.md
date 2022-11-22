@@ -6,6 +6,8 @@ Unfortunately a bit tricky to set up.
 
 ## Setup
 
+All the services are optional. If you don't add proper keys to `.env` file, it will be skipped in runtime.
+
 ### Twitter
 
 1. Create Twitter Developer portal app https://developer.twitter.com/en/portal/dashboard.
